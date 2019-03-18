@@ -14,3 +14,14 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+
+Route::get('/install', 'InstallController@index');
+
+Route::post('install/', [
+    'as' => 'install', 'uses' => 'InstallController@creat_user'
+]);
+
+Route::match(['get', 'post'], 'auth',[
+    'as' => 'install', 'uses' => 'AuthController@creat_user_token'
+]);

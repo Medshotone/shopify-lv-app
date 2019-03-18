@@ -13,12 +13,11 @@ class Install extends Migration
      */
     public function up()
     {
-        Schema::create('install', function (Blueprint $table) {
+        Schema::create('installs', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('store')->unique();
             $table->string('nonce');
             $table->string('access_token');
-            $table->timestamps();
         });
     }
 
@@ -29,6 +28,6 @@ class Install extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('install');
+        Schema::dropIfExists('installs');
     }
 }
