@@ -1,10 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Install;
+use App\Http\Controllers\HmacController;
 use Illuminate\Support\Facades\DB;
-use RandomLib;
-use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 
@@ -21,27 +19,14 @@ class AuthController extends Controller
         $secret_key = env('SHOPIFY_SECRET');
 
         $query = $_GET;
+
         if (!isset($query['code'], $query['hmac'], $query['shop'], $query['state'], $query['timestamp'])) {
-            exit; //or redirect to an error page
+            echo 'Чего то не хватает: '; print_r($query);
         }
 
-        $one_minute_ago = Carbon::now()->subSeconds(60)->timestamp;
-        if ($query['timestamp'] < $one_minute_ago) {
-            //exit; //or redirect to an error page
-        }
-
-        $hmac = $query['hmac'];
         $store = $query['shop'];
-        unset($query['hmac']);
 
-        foreach ($query as $key => $val) {
-            $params[] = "$key=$val";
-        }
-
-        asort($params);
-        $params = implode('&', $params);
-        $calculated_hmac = hash_hmac('sha256', $params, $secret_key);
-        if ($hmac == $calculated_hmac) {
+        if (HmacController::hmac_calc($query, $secret_key)) {
             $client = new Client();
             $response = $client->request(
                 'POST',
@@ -58,11 +43,26 @@ class AuthController extends Controller
             $access_token = $data['access_token'];
 
             $nonce = urlencode($query['state']);
+
+            $DB_result = DB::table('installs')
+                ->where('nonce', $nonce)
+                ->where('store',$store)
+                ->update(['access_token' => $access_token]);
+            if ($DB_result == 1){
+                $data = [
+                    'link' => "https://{$store}/admin/apps/",
+                    'link_text' => 'Вернуться в админ панель приложений.'
+                ];
+                return view('after_auth',$data);
+            }else{
+                DB::table('installs')
+                    ->where('store',$store)
+                    ->delete();
+                echo 'Что то пошло не так, попробуйте еще раз.';
+            }
+        }else{
+            echo 'Переданные данные не совпадают.';
         }
 
-        if (DB::table('installs')->where('nonce', $nonce)->where('store',$store)->get('id')) {
-
-            var_dump(DB::table('installs')->where('nonce', $nonce)->where('store',$store)->get('id'));
-        }
     }
 }
