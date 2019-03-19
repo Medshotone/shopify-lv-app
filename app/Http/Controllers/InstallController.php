@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 use App\Install;
-use App\Http\Controllers\HmacController;
 use RandomLib;
 use Illuminate\Http\Request;
 

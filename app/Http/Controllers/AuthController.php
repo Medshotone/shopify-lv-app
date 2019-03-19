@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Http\Controllers\HmacController;
+use App\library\HmacCheck;
 use Illuminate\Support\Facades\DB;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
@@ -26,7 +26,7 @@ class AuthController extends Controller
 
         $store = $query['shop'];
 
-        if (HmacController::hmac_calc($query, $secret_key)) {
+        if (HmacCheck::hmac_calc($query, $secret_key)) {
             $client = new Client();
             $response = $client->request(
                 'POST',

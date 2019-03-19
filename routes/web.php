@@ -25,3 +25,5 @@ Route::post('install/', [
 Route::match(['get', 'post'], 'auth',[
     'as' => 'install', 'uses' => 'AuthController@creat_user_token'
 ]);
+
+Route::get('/customize_product/', 'CustomFieldsController@index');
