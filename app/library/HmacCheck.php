@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\library;
 
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
-class HmacController extends Controller
+class HmacCheck
 {
     public static function hmac_calc($query, $secret_key){
         $one_minute_ago = Carbon::now()->subSeconds(60)->timestamp;
