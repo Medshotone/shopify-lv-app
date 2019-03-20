@@ -34,3 +34,6 @@ Route::post('customize_product/update', [
 Route::post('customize_product/delete', [
     'as' => 'customize_product/delete', 'uses' => 'CustomFieldsController@metafield_delete'
 ]);
+Route::post('customize_product/create', [
+    'as' => 'customize_product/create', 'uses' => 'CustomFieldsController@metafield_create'
+]);

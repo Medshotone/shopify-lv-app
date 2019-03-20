@@ -25,6 +25,11 @@ class CustomFieldsController extends Controller
     public function metafield_delete(){
         ProductMetaFields::deleteProductMetaFields($_GET,$_POST['owner_id'], $_POST['metafield_id']);
     }
+
+    public function metafield_create(){
+
+        ProductMetaFields::createProductMetaFields($_GET,$_POST['owner_id'], $_POST['namespace'], $_POST['key'], $_POST['value'], $_POST['value_type']);
+    }
 }
 
 //exaple uses

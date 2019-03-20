@@ -118,8 +118,11 @@ class ProductMetaFields
             echo 'Неверные входные данные';
         }
     }
-    public static function createProductMetaFields($GET_from_shopify, $owner_id, $namespace, $key, $value, $value_type ='string'){
+    public static function createProductMetaFields($GET_from_shopify, $owner_id, $namespace, $key, $value, $value_type){
         $secret_key = env('SHOPIFY_SECRET');
+        if (empty($value_type)){
+            $value_type ='string';
+        }
         if (HmacCheck::hmac_calc($GET_from_shopify, $secret_key)) {
             $shop = $GET_from_shopify['shop'];
             $DB_result = DB::table('installs')
