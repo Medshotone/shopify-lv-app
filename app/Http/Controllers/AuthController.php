@@ -26,7 +26,7 @@ class AuthController extends Controller
 
         $store = $query['shop'];
 
-        if (HmacCheck::hmac_calc($query, $secret_key)) {
+        if (HmacCheck::hmac_calc($query, $secret_key, true)) {
             $client = new Client();
             $response = $client->request(
                 'POST',

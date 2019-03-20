@@ -27,3 +27,10 @@ Route::match(['get', 'post'], 'auth',[
 ]);
 
 Route::get('/customize_product/', 'CustomFieldsController@index');
+
+Route::post('customize_product/update', [
+    'as' => 'customize_product/update', 'uses' => 'CustomFieldsController@metafields_update'
+]);
+Route::post('customize_product/delete', [
+    'as' => 'customize_product/delete', 'uses' => 'CustomFieldsController@metafield_delete'
+]);

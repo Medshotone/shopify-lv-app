@@ -7,9 +7,9 @@ use Illuminate\Http\Request;
 
 class HmacCheck
 {
-    public static function hmac_calc($query, $secret_key){
+    public static function hmac_calc($query, $secret_key, $timestamp_check = false){
         $one_minute_ago = Carbon::now()->subSeconds(60)->timestamp;
-        if ($query['timestamp'] < $one_minute_ago) {
+        if ($timestamp_check == true and $query['timestamp'] < $one_minute_ago) {
             return false;
             exit;
         }

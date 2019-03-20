@@ -1,9 +1,11 @@
-<!DOCTYPE html>
+<?php /* /var/www/lv-shopify.loc/resources/views/products.blade.php */ ?>
+        <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Products</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/picnic/6.1.1/picnic.min.css">
+    <script src="http://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
 </head>
 <body>
 
@@ -16,38 +18,87 @@
 <main>
     <h1>Products</h1>
     <div class="flex two">
-        @php
-            //dd($all_products);
-        @endphp
+        <?php
+        //dd($all_products);
+        ?>
         <div>
-        @foreach ($all_products['products'] as $product)
+            <?php $__currentLoopData = $all_products['products']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <article class="card">
                 <section>
-                    <h3>{{ $product['title'] }}</h3>
+                    <h3><?php echo e($product['title']); ?></h3>
                 </section>
-                @if($product['images'])
+                <?php if($product['images']): ?>
                 <section>
-                    @foreach ($product['images'] as $image)
-                        <img style="width: 100px; height: 100px;" id="{{$image['id']}}" src="{{$image['src']}}" alt="{{ $product['title'] }}">
-                    @endforeach
+                    <?php $__currentLoopData = $product['images']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $image): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                    <img style="width: 100px; height: 100px;" id="<?php echo e($image['id']); ?>" src="<?php echo e($image['src']); ?>" alt="<?php echo e($product['title']); ?>">
+                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                 </section>
-                @endif
-                @if($product['metafields'])
+                <?php endif; ?>
+                <?php if($product['metafields']): ?>
                 <section>
-                    <form method="POST">
-                        <input type="hidden" name="owner_id" value="{{$product['id']}}">
-                        @foreach ($product['metafields'] as $key => $metafield)
-                            <div style="margin-bottom: 20px">
-                                <span>key: </span><input type="text" name="key[{{$key}}]" value="{{$metafield['key']}}">
-                                <span>value: </span><input type="text" name="value[{{$key}}]" value="{{$metafield['value']}}">
-                            </div>
-                        @endforeach
+                    <form class="metafields">
+                        <?php echo csrf_field(); ?>
+                        <input type="hidden" name="owner_id" value="<?php echo e($product['id']); ?>">
+                        <?php $__currentLoopData = $product['metafields']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $metafield): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <div style="margin-bottom: 20px">
+                            <span>key: <span style="display: block;"><?php echo e($metafield['key']); ?></span></span>
+                            <span>value: </span><input type="text" name="value[<?php echo e($key); ?>]" value="<?php echo e($metafield['value']); ?>">
+                            <a onclick="delete_metafield({{$key}}, {{$product['id']}}, '{{ csrf_token() }}')"><span>DELETE</span></a>
+                        </div>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         <button>Отправить все кастом поля для продукта</button>
                     </form>
                 </section>
-                @endif
+                <?php endif; ?>
             </article>
-        @endforeach
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+            <script>
+                function delete_metafield(metafield_id, product_id, token){
+                    //get the action-url of the form
+                    var actionurl = window.location.search;
+                    //do your own request an handle the results
+                    $.ajax({
+                        url: 'delete'+actionurl,
+                        type: 'post',
+                        dataType: 'text',
+                        //contentType: "text",
+                        data: 'owner_id='+product_id+'&metafield_id='+metafield_id+'&_token='+token,
+                        success: function(data) {
+                            console.log(data);
+                        },
+                        error: function(XMLHttpRequest, textStatus, errorThrown) {
+                            console.log("Status: " + textStatus); console.log("Error: " + errorThrown);
+                        }
+                    });
+                    return false;
+                }
+                $(function() {
+                    $("form.metafields").submit(function(e) {
+                        //prevent Default functionality
+                        e.preventDefault();
+                        //get the action-url of the form
+                        var actionurl = window.location.search;;
+                        //do your own request an handle the results
+                        $.ajax({
+                            url: 'update'+actionurl,
+                            type: 'post',
+                            dataType: 'text',
+                            //contentType: "text",
+                            data: $(this).find('input').serialize(),
+                            success: function(data) {
+                                //console.log(e.target.getElementsByTagName('button')[0]);
+                                $(e.target.getElementsByTagName('button')[0]).html('Прошло успешно '+data);
+                                console.log(data);
+                            },
+                            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                                console.log("Status: " + textStatus); console.log("Error: " + errorThrown);
+                            }
+                        });
+                        return false;
+                    });
+
+                });
+            </script>
         </div>
     </div>
 </main>
