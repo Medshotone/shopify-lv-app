@@ -20,12 +20,18 @@
     <div class="flex two">
         <?php
         //dd($all_products);
-        ?>
+        $options_list = '';
+        foreach ($all_products['products'] as $value){
+            $options_list .= "<option value=".$value['handle'].">".$value['title']."</option>";
+        } ?>
         <div>
             <?php $__currentLoopData = $all_products['products']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
             <article class="card">
                 <section>
                     <h3><?php echo e($product['title']); ?></h3>
+                </section>
+                <section>
+                    <h4>handle: {{$product['handle']}}</h4>
                 </section>
                 <?php if($product['images']): ?>
                 <section>
@@ -37,30 +43,28 @@
                 <?php if($product['metafields']): ?>
                 <section>
                     <form class="metafields_update">
-                        <?php echo csrf_field(); ?>
+                        @csrf
                         <input type="hidden" name="owner_id" value="<?php echo e($product['id']); ?>">
                         <?php $__currentLoopData = $product['metafields']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $metafield): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <div style="margin-bottom: 20px">
-                            <span>key: <span style="display: block;"><?php echo e($metafield['key']); ?></span></span>
-                            <span>value: </span><input type="text" name="value[<?php echo e($key); ?>]" value="<?php echo e($metafield['value']); ?>">
-                            <a onclick="delete_metafield({{$key}}, {{$product['id']}}, '{{ csrf_token() }}', this)"><span>DELETE</span></a>
+                            @if(false)<span>key: <span style="display: block;"><?php echo e($metafield['key']); ?></span></span>@endif
+                            <select name="value[<?php echo e($key); ?>]" multiple="multiple" style="height: 100px;"><?php echo $options_list ?></select>
+                            <!--<span>value: </span><input type="text" name="value[<?php echo e($key); ?>]" value="<?php echo e($metafield['value']); ?>">-->
+                            @if(false)<a onclick="delete_metafield({{$key}}, {{$product['id']}}, '{{ csrf_token() }}', this)"><span>DELETE</span></a>@endif
                         </div>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         <button>Отправить все кастом поля для продукта</button>
                     </form>
                 </section>
-                <?php endif; ?>
-                <section>
+                @else <section>
                     <form class="metafields_create">
                         @csrf
                         <input type="hidden" name="owner_id" value="{{$product['id']}}">
-                        <span>namespace: </span><input type="text" name="namespace" placeholder="namespace">
-                        <span>key: </span><input type="text" name="key" placeholder="key">
                         <span>value: </span><input type="text" name="value" placeholder="value">
-                        <span>value_type: </span><input type="text" name="value_type" placeholder="default - string, integer, json_string">
                         <button>создать кастом поле</button>
                     </form>
                 </section>
+                <?php endif; ?>
             </article>
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             <script>
@@ -88,14 +92,22 @@
                         //prevent Default functionality
                         e.preventDefault();
                         //get the action-url of the form
-                        var actionurl = window.location.search;;
+                        var actionurl = window.location.search;
+                        var data_selected = "";
+                        $(this).find('select option:selected').each(function(index, item) {
+                            console.log(index);
+                            data_selected += $( this ).text() + ",";
+                        });
+                        var data_selected_name = $(this).find('select').attr( "name" );
+                        var serialize_data = $(this).find('input').serialize();
+                        console.log(serialize_data+'&'+data_selected_name+'='+data_selected);
                         //do your own request an handle the results
                         $.ajax({
                             url: 'update'+actionurl,
                             type: 'post',
                             dataType: 'text',
                             //contentType: "text",
-                            data: $(this).find('input').serialize(),
+                            data: serialize_data+'&'+data_selected_name+'='+data_selected,
                             success: function(data) {
                                 //console.log(e.target.getElementsByTagName('button')[0]);
                                 $(e.target.getElementsByTagName('button')[0]).html('Прошло успешно '+data);

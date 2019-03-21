@@ -118,7 +118,7 @@ class ProductMetaFields
             echo 'Неверные входные данные';
         }
     }
-    public static function createProductMetaFields($GET_from_shopify, $owner_id, $namespace, $key, $value, $value_type){
+    public static function createProductMetaFields($GET_from_shopify, $owner_id, $namespace, $key, $value, $value_type = 'string'){
         $secret_key = env('SHOPIFY_SECRET');
         if (empty($value_type)){
             $value_type ='string';

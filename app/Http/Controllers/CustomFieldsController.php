@@ -28,7 +28,7 @@ class CustomFieldsController extends Controller
 
     public function metafield_create(){
 
-        ProductMetaFields::createProductMetaFields($_GET,$_POST['owner_id'], $_POST['namespace'], $_POST['key'], $_POST['value'], $_POST['value_type']);
+        ProductMetaFields::createProductMetaFields($_GET,$_POST['owner_id'], 'related', 'productHandlers', $_POST['value']);
     }
 }
 
