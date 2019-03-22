@@ -48,22 +48,23 @@
                         <?php $__currentLoopData = $product['metafields']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $metafield): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <div style="margin-bottom: 20px">
                             @if(false)<span>key: <span style="display: block;"><?php echo e($metafield['key']); ?></span></span>@endif
-                            <select name="value[<?php echo e($key); ?>]" multiple="multiple" style="height: 100px;"><?php echo $options_list ?></select>
+                                <select name="value[<?php echo e($key); ?>]" multiple="multiple" style="height: 100px;"><?php echo $options_list ?></select>
                             <!--<span>value: </span><input type="text" name="value[<?php echo e($key); ?>]" value="<?php echo e($metafield['value']); ?>">-->
-                            @if(false)<a onclick="delete_metafield({{$key}}, {{$product['id']}}, '{{ csrf_token() }}', this)"><span>DELETE</span></a>@endif
+                                @if(false)<a onclick="delete_metafield({{$key}}, {{$product['id']}}, '{{ csrf_token() }}', this)"><span>DELETE</span></a>@endif
                         </div>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         <button>Отправить все кастом поля для продукта</button>
                     </form>
                 </section>
-                @else <section>
-                    <form class="metafields_create">
-                        @csrf
-                        <input type="hidden" name="owner_id" value="{{$product['id']}}">
-                        <span>value: </span><input type="text" name="value" placeholder="value">
-                        <button>создать кастом поле</button>
-                    </form>
-                </section>
+                @else
+                    <section>
+                        <form class="metafields_create">
+                            @csrf
+                            <input type="hidden" name="owner_id" value="{{$product['id']}}">
+                            <select name="value" multiple="multiple" style="height: 100px;"><?php echo $options_list ?></select>
+                            <button>создать кастом поле</button>
+                        </form>
+                    </section>
                 <?php endif; ?>
             </article>
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -95,23 +96,19 @@
                         var actionurl = window.location.search;
                         var data_selected = "";
                         $(this).find('select option:selected').each(function(index, item) {
-                            console.log(index);
-                            data_selected += $( this ).text() + ",";
+                            data_selected += $( this ).val() + ",";
                         });
                         var data_selected_name = $(this).find('select').attr( "name" );
                         var serialize_data = $(this).find('input').serialize();
-                        console.log(serialize_data+'&'+data_selected_name+'='+data_selected);
                         //do your own request an handle the results
                         $.ajax({
                             url: 'update'+actionurl,
                             type: 'post',
-                            dataType: 'text',
+                            dataType: 'json',
                             //contentType: "text",
                             data: serialize_data+'&'+data_selected_name+'='+data_selected,
                             success: function(data) {
-                                //console.log(e.target.getElementsByTagName('button')[0]);
-                                $(e.target.getElementsByTagName('button')[0]).html('Прошло успешно '+data);
-                                console.log(data);
+                                $(e.target.getElementsByTagName('button')[0]).html('Прошло успешно '+data.metafield.value);
                             },
                             error: function(XMLHttpRequest, textStatus, errorThrown) {
                                 console.log("Status: " + textStatus); console.log("Error: " + errorThrown);
@@ -124,20 +121,25 @@
                         //prevent Default functionality
                         e.preventDefault();
                         //get the action-url of the form
-                        var actionurl = window.location.search;;
+                        var actionurl = window.location.search;
+                        var data_selected = "";
+                        $(this).find('select option:selected').each(function(index, item) {
+                            data_selected += $( this ).val() + ",";
+                        });
+                        var data_selected_name = $(this).find('select').attr( "name" );
+                        var serialize_data = $(this).find('input').serialize();
                         //do your own request an handle the results
                         $.ajax({
                             url: 'create'+actionurl,
                             type: 'post',
-                            dataType: 'text',
+                            dataType: 'json',
                             //contentType: "text",
-                            data: $(this).find('input').serialize(),
+                            data: serialize_data+'&'+data_selected_name+'='+data_selected,
                             success: function(data) {
                                 //console.log(e.target.getElementsByTagName('button')[0]);
-                                $(e.target.getElementsByTagName('button')[0]).html('Прошло успешно '+data);
-                                console.log(data);
+                                $(e.target.getElementsByTagName('button')[0]).html('Прошло успешно '+data.metafield.value);
                             },
-                            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                            error: function(data, XMLHttpRequest, textStatus, errorThrown) {
                                 console.log("Status: " + textStatus); console.log("Error: " + errorThrown);
                             }
                         });

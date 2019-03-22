@@ -76,10 +76,11 @@ class ProductMetaFields
                     ]);
                    if ($response->getStatusCode() == 200){
                        $result++;
+                       print_r($response->getBody()->getContents());
                     }
                 }
 
-                echo "$result/$target измененно";
+                //echo "$result/$target измененно";
             }else{
 
                 echo 'Что то пошло не так, попробуйте еще раз.';
@@ -148,8 +149,9 @@ class ProductMetaFields
                 $response = $client->request('POST', "https://{$shop}/admin/products/{$owner_id}/metafields.json",[
                     'json' => $data
                 ]);
-                if ($response->getStatusCode() == 200){
-                    echo "Созданно: $key";
+                if ($response->getStatusCode() == 201){
+                    //echo "Созданно: $key";
+                    print_r($response->getBody()->getContents());
                 }
             }else{
 
